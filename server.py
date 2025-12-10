@@ -1437,10 +1437,15 @@ async def health():
 
 # CORS MUST be added BEFORE including the router
 # This ensures preflight OPTIONS requests are handled correctly
+# Note: allow_credentials=True does NOT work with allow_origins=["*"]
+# You must specify exact origins when using credentials
+_cors_allow_all = settings.CORS_ORIGINS == "*"
+logger.info(f"CORS Configuration: origins={settings.cors_origins_list}, allow_all={_cors_allow_all}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
-    allow_credentials=True,
+    allow_credentials=not _cors_allow_all,  # Credentials only with specific origins
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
